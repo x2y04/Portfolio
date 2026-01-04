@@ -1,0 +1,183 @@
+        body {
+            background-color: #f4eee8;
+            font-family: "PingFang TC", "Microsoft JhengHei", serif;
+            color: #5d4a44;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(141, 120, 108, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            letter-spacing: 2px;
+            color: #8b7368;
+            margin-bottom: 30px;
+        }
+
+        /* 空訊息樣式*/
+        .empty-msg {
+            text-align: center;
+            color: #b5a499;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* 輸入區塊 */
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 12px 18px;
+            border: 1px solid #e5d9d3;
+            border-radius: 15px;
+            background-color: #faf8f6;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #c2a38a;
+            background-color: #fff;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #c2a38a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #a6866d;
+        }
+
+        /* 待辦清單區塊 */
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+
+        .todo-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .todo-list li {
+            background: #fff;
+            margin-bottom: 12px;
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 1px solid #f0e6e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .todo-list li:hover {
+            border-color: #d9c7bd;
+        }
+
+        .item-text {
+            flex-grow: 1;
+        }
+
+        .todo-btn {
+            display: flex;
+            gap: 10px;
+        }
+
+        .todo-btn button {
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .finish-btn {
+            background-color: #eaddd5;
+            color: #8b7368;
+        }
+
+        .finish-btn:hover {
+            background-color: #d9c7bd;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .delete-btn {
+            background-color: #e29578;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #d47a5b;
+            box-shadow: 0 4px 8px rgba(226, 149, 120, 0.3);
+        }
+
+        .todo-btn button:active {
+            transform: scale(0.95);
+        }
+
+        /* 已完成清單 */
+
+        .finish-section {
+            margin-top: 30px;
+        }
+
+        .divider {
+            border-top: 1px dashed #d9c7bd;
+            margin-bottom: 20px;
+        }
+
+        .finish-section h3 {
+            text-align: center;
+            color: #8b7368;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .finish-list {
+            list-style: none;
+            padding: 0;
+            opacity: 0.6;
+        }
+
+        .finish-list li {
+            background: #fafafa;
+            margin-bottom: 8px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #f0e6e0;
+        }
+
+        .finish-text {
+            text-decoration: line-through;
+            color: #b5a499;
+        }

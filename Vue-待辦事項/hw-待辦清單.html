@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待辦清單</title>
+
+    <link rel="stylesheet" href="./css/hw-待辦清單.css">
+</head>
+
+<!-- 作業要求 -->
+<!-- v-model:文字輸入框 -->
+<!-- array.push:按鈕加入資料 -->
+<!-- v-for:列表顯示事項 -->
+<!-- v-if v-else 沒資料時顯示提示 -->
+
+<!-- 完整：新增、編輯、刪除 -->
+<!-- 進階：已完成、未完成 -->
+
+<body>
+    <!-- 設置Vue的渲染div -->
+    <div id="app" class="container">
+        <h2>My To-Do List</h2>
+        <p class="empty-msg">今天也是美好的一天！</p>
+
+        <!-- 輸入框 -->
+        <div class="input-group">
+            <input type="text" v-model="todo" placeholder="想要做點什麼呢？" @keyup.enter="btnSubmit">
+            <!-- 沒有輸入內容時，按鈕不給使用 -->
+            <button type="button" :disabled="!todo.trim()" @click="btnSubmit">新增</button>
+        </div>
+
+        <div class="list-section">
+            <!-- 沒有待辦事項時 -->
+            <p v-if="createList.length === 0" class="empty-msg">
+                目前沒有待辦事項，享受一下休息時光吧 ☕
+            </p>
+
+            <!-- 有待辦事項時 -->
+            <div v-else>
+                <div class="list-header">
+                    <h2>待辦清單</h2>
+                    <button type="button" class="clear-btn" @click="clearTodo">清除</button>
+                </div>
+                <ul class="todo-list">
+                    <li v-for="(item, index) in createList" :key="index">
+                        {{ item }}
+                        <div class="todo-btn">
+                            <button class="finish-btn" @click="finishItem(index)">完成</button>
+                            <button class="delete-btn" @click="deleteItem(index)">刪除</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 已完成清單 -->
+            <div v-if="finishList.length > 0" class="finish-section">
+                <div class="divider"></div>
+
+                <div class="list-header">
+                    <h3>已完成事項☕✨</h3>
+                    <button type="button" class="clear-btn" @click="clearFinish">清除</button>
+                </div>
+
+
+                <ul class="finish-list">
+                    <li v-for="(item, index) in finishList" :key="index">
+                        <span class="finish-text">{{ item }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- 引入Vue的CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- 初始化Vue -->
+    <script>
+        const { createApp, ref } = Vue;
+
+
+        const app = createApp({
+            // 設置變數或邏輯的地方
+            setup() {
+                const todo = ref('');
+                const createList = ref([]);
+                const finishList = ref([]);
+
+                const btnSubmit = () => {
+                    createList.value.push(todo.value);
+                    // 輸入的內容存進陣列後清空輸入框內容
+                    todo.value = "";
+                }
+
+                // 清除待辦清單陣列內的內容
+                const clearTodo = () => {
+                    createList.value = [];
+                }
+
+                // 
+                const finishItem = (index) => {
+                    // 定義一個暫存的變數movedItem
+                    // splice(index, 1)取位置及刪除數量，[0]是因為存進去的位置是0
+                    // 存進完成的清單
+                    const movedItem = createList.value.splice(index, 1)[0];
+                    finishList.value.push(movedItem);
+                };
+
+                const deleteItem = (index) => {
+                    createList.value.splice(index, 1);
+                };
+
+                const clearFinish = () => {
+                    finishList.value = [];
+                }
+
+                // 出餐口，必須通過這裡才能將資料展示出去
+                return {
+                    todo,
+                    createList,
+                    btnSubmit,
+                    deleteItem,
+                    finishList,
+                    finishItem,
+                    clearTodo,
+                    clearFinish
+
+                }
+            }
+        });
+        app.mount('#app');
+
+    </script>
+</body>
+
+</html>

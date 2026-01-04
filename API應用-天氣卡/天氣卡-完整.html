@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>天氣卡</title>
+
+  <style>
+    body{
+      font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+    .btn-region {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 15px 20px;
+      background-color: #f0f4f8;
+      border-bottom: 2px solid #e0e0e0;
+      justify-content: center;
+    }
+
+    .btn-region button {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(to top, rgb(170, 170, 249), rgb(134, 189, 243));
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-region button:hover {
+      background: linear-gradient(to top, rgb(114, 114, 216), rgb(84, 165, 247));
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn-region button:focus {
+      background: linear-gradient(to bottom, rgb(114, 114, 216), rgb(84, 165, 247));
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .card-region {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 300px);
+      gap: 20px;
+      padding: 20px;
+      background-color: #ffffff;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(74, 144, 226, 0.15);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-top {
+      background: linear-gradient(to top, rgb(170, 170, 249), rgb(134, 189, 243));
+      padding: 15px;
+      text-align: center;
+      color: white;
+      flex: 1;
+    }
+
+    .city {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-shadow: none;
+      display: block;
+    }
+
+    .wx-desc {
+      font-size: 16px;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .card-top img {
+      width: 85px;
+      margin: 5px 0;
+    }
+
+    .card-bottom {
+      background-color: #ffffff;
+      padding: 15px 20px;
+      color: #333;
+    }
+
+    .main-temp {
+      font-size: 26px;
+      font-weight: 700;
+      color: #2c5a9e;
+      text-align: center;
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eef2f7;
+      padding-top: 12px;
+      margin-bottom: 15px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      color: #546e7a;
+      font-weight: 500;
+    }
+
+    .info-item b {
+      font-size: 16px;
+      color: #4a90e2;
+      margin-bottom: 10px;
+    }
+
+    .time {
+      font-size: 13px;
+      color: #90a4ae;
+      margin-top: 5px;
+      display: block;
+    }
+  </style>
+
+
+</head>
+
+<body>
+  <div class="btn-region">
+    <button type="button">全部</button>
+    <button type="button">北部</button>
+    <button type="button">中部</button>
+    <button type="button">南部</button>
+    <button type="button">東部</button>
+    <button type="button">離島地區</button>
+  </div>
+  <div class="card-region"></div>
+  <script>
+    // 二維陣列
+    const cities = [
+      ['基隆市', '新北市', '臺北市', '桃園市', '新竹市', '新竹縣', '苗栗縣', '臺中市', '南投縣', '彰化縣', '雲林縣', '嘉義市', '嘉義縣', '臺南市', '高雄市', '屏東縣',
+        '宜蘭縣', '花蓮縣', '臺東縣', '澎湖縣', '金門縣', '連江縣'
+      ],
+      ['基隆市', '新北市', '臺北市', '桃園市', '新竹市', '新竹縣'],
+      ['苗栗縣', '臺中市', '南投縣', '彰化縣', '雲林縣'],
+      ['嘉義市', '嘉義縣', '臺南市', '高雄市', '屏東縣'],
+      ['宜蘭縣', '花蓮縣', '臺東縣'],
+      ['澎湖縣', '金門縣', '連江縣'],
+    ]
+
+    nowCities = cities[0];
+    console.log(nowCities);
+
+    // 氣象署的API網址
+    const url = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWA-622C8A4D-2F9A-4C19-A443-661B44642E03';
+    const orgData = {};
+
+    // 非同步
+    fetch(url)
+      .then(function (response) {
+        // console.log(response);
+        return response.json();
+      })
+      .then(function (data) {
+        // console.log(data);
+        // 所有執行的程式都要寫在這裡
+        // 1.整理資料
+        orginazeData(data);
+        console.log(orgData);
+
+        // 2.顯示各縣市天氣狀況卡片
+        arrangeCities();
+      });
+
+    function orginazeData(result) {
+      // console.log(result);
+      // 拿22縣市基本資料
+      const locations = result.records.location;
+      console.log(locations);
+      locations.forEach(location => {
+        const cityName = location.locationName;
+        const wEle0Time0 = location.weatherElement[0].time[0];
+        const startTime = wEle0Time0.startTime;
+        const endTime = wEle0Time0.endTime;
+        const wx = wEle0Time0.parameter.parameterName;
+        const wxImgCode = wEle0Time0.parameter.parameterValue;
+        const wEle1Time0 = location.weatherElement[1].time[0];
+        const pop = wEle1Time0.parameter.parameterName;
+        const wEle2Time0 = location.weatherElement[2].time[0];
+        const minT = wEle2Time0.parameter.parameterName;
+        const wEle3Time0 = location.weatherElement[3].time[0];
+        const Ci = wEle3Time0.parameter.parameterName;
+        const wEle4Time0 = location.weatherElement[4].time[0];
+        const maxT = wEle4Time0.parameter.parameterName;
+
+        // 把上面各項整理好的縣市資料放入存放整理好的物件(orgData)內
+        // cityName就是key，一切這個資料就是key value
+        orgData[cityName] = {
+          // 'wx': wx,
+          wx: wx,
+          wxImgCode: wxImgCode,
+          startTime: startTime,
+          endTime: endTime,
+          pop: pop,
+          minT: minT,
+          Ci: Ci,
+          maxT: maxT
+        }
+
+        // ==================
+        // console.log(cityName);
+        // console.log(wEle0Time0);
+        // console.log(startTime);
+        // console.log(wx);
+        // console.log(wxImgCode)
+        // console.log(pop);
+        // console.log(minT);
+
+      });
+
+    }
+
+
+    const btnAll = document.querySelectorAll('button');
+    const cardRegion = document.querySelector('.card-region');
+    let content = '';
+
+    btnAll.forEach((btn, index) => {
+      btn.addEventListener('click', () => {
+        // 取得新城市陣列的資料
+        nowCities = cities[index];
+        arrangeCities()
+      })
+    })
+
+    function arrangeCities() {
+      content = '';
+      nowCities.forEach((city, index) => {
+        //  city的vale就是資料
+        const cityData = orgData[city];
+        let imgTextNumber = cityData.wxImgCode;
+        if (Number(imgTextNumber) < 10) {
+          imgTextNumber = `0${imgTextNumber}`
+        }
+        console.log(imgTextNumber)
+
+        const imgUrl = `https://www.cwa.gov.tw/V8/assets/img/weather_icons/weathers/svg_icon/day/${imgTextNumber}.svg`;
+
+        content += `
+          <div class="card">
+            <div class="card-top">
+              <span class="city">${city}</span>
+              <img src="${imgUrl}">
+              <span class="wx-desc">${cityData.wx}</span>
+            </div>
+            <div class="card-bottom">
+              <span class="main-temp">${cityData.minT}°C - ${cityData.maxT}°C</span>
+              <div class="info">
+                <div class="info-item">
+                  <span>降雨機率</span>
+                  <b>${cityData.pop}%</b>
+                </div>
+                <div class="info-item">
+                  <span>舒適度</span>
+                  <b>${cityData.Ci}</b>
+                </div>
+              </div>
+              <span class="time">
+                ${cityData.startTime.replaceAll("-", "/").slice(0, -3)}  ~  ${cityData.endTime.replaceAll("-", "/").slice(0, -3)}
+              </span>
+            </div>
+          </div>
+        `;
+
+        console.log(city);
+        console.log(cityData.startTime);
+        console.log(cityData.wx);
+        console.log(cityData.wxImgCode)
+        console.log(cityData.pop);
+        console.log(cityData.minT);
+      });
+      cardRegion.innerHTML = content;
+    }
+  </script>
+
+</body>
+
+</html>

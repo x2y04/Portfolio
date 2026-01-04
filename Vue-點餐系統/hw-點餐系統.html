@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哩賀！呷飽未- 點餐系統</title>
+    <style>
+        body {
+            background-color: #F0F5F9;
+            color: #001219;
+            font-family: "Microsoft JhengHei", sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #app {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            gap: 20px;
+        }
+
+        /* --- 左側區域 --- */
+        .menu-container {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 95, 115, 0.1);
+            overflow: hidden;
+            border: 2px solid #58B2DC;
+        }
+
+        .header-section {
+            background-color: #58B2DC;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            margin: 0;
+            letter-spacing: 2px;
+            font-size: 2rem;
+        }
+
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            background: #FAD689;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .btn-group button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            background: white;
+            color: #58B2DC;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-group button.active {
+            background: #58B2DC;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 商品列表 */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 25px;
+        }
+
+        .product-card {
+            border: 2px solid #E0E0E0;
+            border-radius: 15px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .product-card.is-selected {
+            border: 2px solid #EE9B00;
+            background-color: #FFF9ED;
+
+        }
+
+        .product-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+
+        .product-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .product-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+            color: #002233;
+        }
+
+        .price-tag {
+            color: #941B0C;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .quantity-control button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #58B2DC;
+            background: white;
+            color: #58B2DC;
+            cursor: pointer;
+        }
+
+        .quantity-control input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid #DDD;
+            border-radius: 4px;
+        }
+
+        /* --- 右側結帳區域 --- */
+        .cart {
+            width: 350px;
+            background: #58B2DC;
+            color: white;
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: 85vh;
+        }
+
+        .cart-title {
+            font-size: 1.5rem;
+            border-bottom: 2px solid #FAD689;
+            ;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .delete-btn {
+            background: #BB3E03;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .total-section {
+            border-top: 2px solid #FAD689;
+            ;
+            padding-top: 20px;
+        }
+
+        .total-price {
+            font-size: 1.8rem;
+            color: white;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: #EE9B00;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="menu-container">
+            <div class="header-section">
+                <h1>哩賀！呷飽未</h1>
+                <p>港邊現撈，鮮美直送</p>
+            </div>
+
+            <div class="btn-group">
+                <!-- active: nowPage === 'main' 按鈕樣式變化 -->
+                <!-- @click="nowPage = 'main'"  切換頁面 -->
+                <button type="button" :class="{ active: nowPage === 'main' }" @click="nowPage = 'main'">
+                    在地美食
+                </button>
+                <button type="button" :class="{ active: nowPage === 'drinks' }" @click="nowPage = 'drinks'">
+                    清涼一下
+                </button>
+            </div>
+
+            <div class="card-container">
+                <div class="product-card" v-show="nowPage === 'main'" v-for="item in mainDish" :key="item.id"
+                    :class="{ 'is-selected': item.count > 0 }">
+                    <img :src="item.img" class="product-image" alt="餐點圖片">
+                    <div class="product-info">
+                        <h3>{{ item.name }}</h3>
+                        <div class="price-tag">${{ item.price }}</div>
+                        <div class="quantity-control">
+                            <button @click="item.count > 0 ? item.count-- : 0" min:=0>-</button>
+                            <label><input v-model.number="item.count"></label>
+                            <button @click="item.count++">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" v-show="nowPage === 'drinks'" v-for="item in drinks" :key="item.id"
+                    :class="{ 'is-selected': item.count > 0 }">
+                    <img :src="item.img" class="product-image" alt="飲料圖片">
+                    <div class="product-info">
+                        <h3>{{ item.name }}</h3>
+                        <div class="price-tag">${{ item.price }}</div>
+                        <div class="quantity-control">
+                            <button @click="item.count > 0 ? item.count-- : 0">-</button>
+                            <label><input v-model.number="item.count"></label>
+                            <button @click="item.count++">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cart">
+            <div class="cart-title">訂單內容</div>
+            <div class="cart-items">
+                <div class="cart-item" v-for="item in cartItems" :key="item.id">
+                    <div class="item-detail">
+                        <b>{{ item.name }}</b> <br>
+                        <small>${{ item.price }} x {{ item.count }}</small>
+                    </div>
+                    <span>${{ item.price * item.count }} <button class="delete-btn" type="button"
+                            @click="deleteItem(item) ">刪除</button></span>
+                </div>
+                <p v-if="cartItems.length === 0">人客啊！<br>咱家的爐火已經準備好了，就等你來點餐啦！</p>
+
+            </div>
+
+            <div class="total-section">
+                <div>總計：</div>
+                <div class="total-price">$ {{ totalPrice }}</div>
+                <button type="submit" class="checkout-btn" @click="submitOrder">確認下單</button>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        const app = createApp({
+            setup() {
+                const nowPage = ref('main');
+
+                // 主食
+                const mainDish = ref([
+                    { id: 1, name: '招牌櫻花蝦炒飯', price: 120, count: 0, img: 'https://img.ltn.com.tw/Upload/food/page/2019/06/20/190620-9188-00-Zd7tc.png' },
+                    { id: 2, name: '海鮮炒麵', price: 110, count: 0, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMaBrZ9w1JEjp4wM438N_pTwES1cDEk-rZZw&s' },
+                    { id: 3, name: '薑絲深海鮮魚湯', price: 180, count: 0, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQm6K5Bzk9c6ehYMcbc5t7xFHT-Aa9aMmWjjw&s' },
+                    { id: 4, name: '塔香炒海瓜子', price: 220, count: 0, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSt8ioMuaGPvu8JDoGFCNXcLzC4eNko--mxMg&s' },
+                    { id: 5, name: '酥炸蚵仔酥', price: 180, count: 0, img: 'https://i.ytimg.com/vi/RzyQYHeeXeQ/maxresdefault.jpg' },
+                    { id: 6, name: '鳳梨蝦球', price: 250, count: 0, img: 'https://tokyo-kitchen.icook.network/uploads/recipe/cover/356971/4e78e6c862fe3296.jpg' },
+                    { id: 7, name: '五味鮮燙軟絲', price: 280, count: 0, img: 'https://tokyo-kitchen.icook.network/uploads/step/cover/1436210/9df5b0f3607b3896.jpg' },
+                    { id: 8, name: '酥炸龍珠(魷魚嘴)', price: 200, count: 0, img: 'https://i.ytimg.com/vi/4qgt9fih3m0/hqdefault.jpg' },
+                    { id: 9, name: '白灼現撈活蝦', price: 300, count: 0, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTADxwGjaAfg_Or2X4dH0MfRddno34BosncKw&s' },
+                    { id: 10, name: '三杯現切透抽', price: 320, count: 0, img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC3-dkxYqyeN3h7aEA_2rnvX7bRt2af4LkjQ&s' }
+                ]);
+
+                // 飲料
+                const drinks = ref([
+                    { id: 101, name: '18天台灣生啤酒', price: 100, count: 0, img: "https://www.wine0222.com/upload/18%E5%A4%A9%E5%8F%B0%E7%81%A3%E7%94%9F%E5%95%A4%E9%85%92_330ml.png" },
+                    { id: 102, name: '冷泡烏龍茶(無糖)', price: 60, count: 0, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwBM-pp2OAPSHiawBa-9uNgmoP9oR9NJyflQ&s" },
+                    { id: 103, name: '古法酸梅湯', price: 80, count: 0, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbrqgFB-HEzP3Mf_r7nEIm2Gz82SdlREYwPg&s" },
+                    { id: 104, name: '黑松沙士', price: 40, count: 0, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQer9vfAaZzIkLnjEOCfEEWroA_P_WN-UJxaA&s" },
+                    { id: 105, name: '現榨柳橙汁', price: 120, count: 0, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG0BYLhDqFaByHSDZNMHERtq02BH83ETdtpA&s" },
+                    { id: 106, name: '芭樂汁', price: 60, count: 0, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTq5LxzRdlWI45xGjXF2Foa78jAbaVmFsZ7Iw&sC" },
+                    { id: 107, name: '蘋果西打', price: 45, count: 0, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSnPQ76tnTW1fdiPK0cuAQG0twXYOuKn4oyA&s" },
+                    { id: 108, name: '維他露P', price: 40, count: 0, img: "https://i5.momoshop.com.tw/1754630270/goodsimg/TP000/2019/0000/170/TP00020190000170_O.webp" },
+                    { id: 109, name: '愛之味麥仔茶', price: 50, count: 0, img: "https://online.carrefour.com.tw/on/demandware.static/-/Sites-carrefour-tw-m-inner/default/dwc52453a6/images/large/1003500100101.jpg" },
+                    { id: 110, name: '可樂', price: 60, count: 0, img: "https://api.esquirehk.com/var/site/storage/images/_aliases/img_804_w/lifestyle/food-drinks/coca-cola-disadvantages/4206078-1-chi-HK/7.jpg" }
+                ]);
+
+                // 將兩筆資料存入一個陣列後在做過濾
+                const cartItems = computed(() => {
+                    let tempCart = [];
+
+                    mainDish.value.forEach(item => {
+                        if (item.count > 0) {
+                            tempCart.push(item);
+                        }
+                    });
+
+                    drinks.value.forEach(item => {
+                        if (item.count > 0) {
+                            tempCart.push(item);
+                        }
+                    });
+                    return tempCart;
+                });
+
+                // 計算總額
+                const totalPrice = computed(() => {
+                    let total = 0;
+                    cartItems.value.forEach(item => {
+                        total += item.price * item.count;
+                    });
+                    return total;
+                });
+
+                // 刪除項目
+                const deleteItem = (item) => {
+                    item.count = 0
+                };
+
+                const submitOrder = () => {
+                    // 判斷是否有餐點才出單
+                    if (cartItems.value.length === 0) {
+                        alert("人客啊，你還沒點菜啦！先看菜單嘿～");
+                    } else {
+                        alert(`厚啦！單子收到！總共是 ${totalPrice.value} 元。\n廚房火已經開下去了，好料馬上上桌！🔥`);
+
+                        // 請空購物車內容
+                        mainDish.value.forEach(item => item.count = 0);
+                        drinks.value.forEach(item => item.count = 0);
+
+                        // 回到主食頁面
+                        nowPage.value = 'main';
+                    }
+                }
+
+                return {
+                    nowPage,
+                    mainDish,
+                    drinks,
+                    cartItems,
+                    totalPrice,
+                    deleteItem,
+                    submitOrder
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+
+</html>
